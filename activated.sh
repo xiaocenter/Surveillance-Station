@@ -15,30 +15,30 @@ install() {
     STATUS="$(curl -skL ${CPROXY:+-x ${CPROXY}} -w "%{http_code}" "${url}" -o "${file}")"
     STATUS="${STATUS: -3}"
     case "${STATUS}" in
-    "000")
-      rm -f "${file}"
-      echo "Error: ${STATUS}, Failed to connect to GitHub. Please check your network and try again."
-      return 1
-      ;;
-    "200")
-      echo "Info: $(basename "${url}" 2>/dev/null) downloaded successfully."
-      return 0
-      ;;
-    "403")
-      rm -f "${file}"
-      echo "Error: ${STATUS}, Access forbidden to the package on GitHub."
-      return 1
-      ;;
-    "404")
-      rm -f "${file}"
-      echo "Warning: $(basename "${url}" 2>/dev/null) skipped, not exist."
-      return 0
-      ;;
-    *)
-      rm -f "${file}"
-      echo "Error: ${STATUS}, $(basename "${url}" 2>/dev/null) failed to download."
-      return 1
-      ;;
+      "000")
+        rm -f "${file}"
+        echo "Error: ${STATUS}, Failed to connect to GitHub. Please check your network and try again."
+        return 1
+        ;;
+      "200")
+        echo "Info: $(basename "${url}" 2>/dev/null) downloaded successfully."
+        return 0
+        ;;
+      "403")
+        rm -f "${file}"
+        echo "Error: ${STATUS}, Access forbidden to the package on GitHub."
+        return 1
+        ;;
+      "404")
+        rm -f "${file}"
+        echo "Warning: $(basename "${url}" 2>/dev/null) skipped, not exist."
+        return 0
+        ;;
+      *)
+        rm -f "${file}"
+        echo "Error: ${STATUS}, $(basename "${url}" 2>/dev/null) failed to download."
+        return 1
+        ;;
     esac
   }
 
@@ -66,26 +66,26 @@ install() {
     STATUS="$(curl -skL ${CPROXY:+-x ${CPROXY}} -w "%{http_code}" "${VERURL}" -o /dev/null 2>/dev/null)"
     STATUS="${STATUS: -3}"
     case "${STATUS}" in
-    "000")
-      echo "Error: ${STATUS}, Failed to connect to GitHub. Please check your network and try again."
-      exit 1
-      ;;
-    "200") ;;
-    "403")
-      echo "Error: ${STATUS}, Access forbidden to the package on GitHub."
-      exit 1
-      ;;
-    "404")
-      echo "Error: ${STATUS}, Current version not found patch on GitHub."
-      echo "This version is not cracked; please donate to the developer to support his work."
-      echo "    PayPal: https://paypal.me/wovow"
-      echo "这个版本没有破解；请捐赠给开发者以支持他的工作。"
-      exit 1
-      ;;
-    *)
-      echo "Error: ${STATUS}, Failed to download package from GitHub."
-      exit 1
-      ;;
+      "000")
+        echo "Error: ${STATUS}, Failed to connect to GitHub. Please check your network and try again."
+        exit 1
+        ;;
+      "200") ;;
+      "403")
+        echo "Error: ${STATUS}, Access forbidden to the package on GitHub."
+        exit 1
+        ;;
+      "404")
+        echo "Error: ${STATUS}, Current version not found patch on GitHub."
+        echo "This version is not cracked; please donate to the developer to support his work."
+        echo "    PayPal: https://paypal.me/wovow"
+        echo "这个版本没有破解；请捐赠给开发者以支持他的工作。"
+        exit 1
+        ;;
+      *)
+        echo "Error: ${STATUS}, Failed to download package from GitHub."
+        exit 1
+        ;;
     esac
 
     # 获取 patch 文件
@@ -100,7 +100,9 @@ install() {
     ISDL=true
   fi
 
-  /usr/syno/bin/synopkg stop SurveillanceStation
+  SUCCESS=$(/usr/syno/bin/synopkg stop SurveillanceStation | grep -o '"success":[^,}]*' | cut -d':' -f2 | xargs)
+  [ "${SUCCESS}" = "true" ] && echo "Info: Surveillance Station stopped successfully." || echo "Error: Surveillance Station stop failed."
+
   sleep 5
 
   # 处理 patch 文件
@@ -111,7 +113,8 @@ install() {
   done
 
   sleep 5
-  /usr/syno/bin/synopkg start SurveillanceStation
+  SUCCESS=$(/usr/syno/bin/synopkg start SurveillanceStation | grep -o '"success":[^,}]*' | cut -d':' -f2 | xargs)
+  [ "${SUCCESS}" = "true" ] && echo "Info: Surveillance Station started successfully." || echo "Error: Surveillance Station start failed."
 
   [ "${ISDL}" = true ] && rm -rf "${WORK_PATH:?}/patch/${VERSION}/${SS_NAME}"
 }
@@ -129,7 +132,9 @@ uninstall() {
     fi
   }
 
-  /usr/syno/bin/synopkg stop SurveillanceStation
+  SUCCESS=$(/usr/syno/bin/synopkg stop SurveillanceStation | grep -o '"success":[^,}]*' | cut -d':' -f2 | xargs)
+  [ "${SUCCESS}" = "true" ] && echo "Info: Surveillance Station stopped successfully." || echo "Error: Surveillance Station stop failed."
+
   sleep 5
 
   # 处理 patch 文件
@@ -140,7 +145,8 @@ uninstall() {
   done
 
   sleep 5
-  /usr/syno/bin/synopkg start SurveillanceStation
+  SUCCESS=$(/usr/syno/bin/synopkg start SurveillanceStation | grep -o '"success":[^,}]*' | cut -d':' -f2 | xargs)
+  [ "${SUCCESS}" = "true" ] && echo "Info: Surveillance Station started successfully." || echo "Error: Surveillance Station start failed."
 }
 
 if [ ! "${USER}" = "root" ]; then
@@ -167,10 +173,10 @@ fi
 ARCH="$(synogetkeyvalue /var/packages/SurveillanceStation/INFO arch)"
 SUFFIX=""
 case "$(synogetkeyvalue /var/packages/SurveillanceStation/INFO model)" in
-"synology_denverton_dva3219") SUFFIX="_DVA_3219" ;;
-"synology_denverton_dva3221") SUFFIX="_DVA_3221" ;;
-"synology_geminilake_dva1622") SUFFIX="_openvino" ;;
-*) ;;
+  "synology_denverton_dva3219") SUFFIX="_DVA_3219" ;;
+  "synology_denverton_dva3221") SUFFIX="_DVA_3221" ;;
+  "synology_geminilake_dva1622") SUFFIX="_openvino" ;;
+  *) ;;
 esac
 
 SS_NAME="SurveillanceStation-${ARCH}-${VERSION}${SUFFIX}"
@@ -190,10 +196,10 @@ PATCH_FILES=(
 echo "Info: Found ${SS_NAME}"
 
 case "${1}" in
--r | --uninstall)
-  uninstall
-  ;;
-*)
-  install
-  ;;
+  -r | --uninstall)
+    uninstall
+    ;;
+  *)
+    install
+    ;;
 esac
