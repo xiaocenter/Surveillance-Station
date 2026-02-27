@@ -35,8 +35,8 @@ If this code helps and you wish to support me:
 # 1. 普通 Normal
 curl -fsSL https://raw.githubusercontent.com/ohyeah521/Surveillance-Station/main/activated.sh | bash
 # 2. 使用github代理(可自行更换代理, 注意结尾的/) Using github proxy (Please replace the proxy address yourself)
-export GPROXY=https://gh-proxy.com/
-curl -fsSL ${GPROXY}https://raw.githubusercontent.com/ohyeah521/Surveillance-Station/main/activated.sh  | bash
+export GPROXY=https://gh-proxy.org/
+curl -fsSL ${GPROXY:-}https://raw.githubusercontent.com/ohyeah521/Surveillance-Station/main/activated.sh  | bash
 export GPROXY=
 # 3. 使用 http(s)/socks5 代理(请自行更换代理地址) Using http(s)/socks5 proxy (Please replace the proxy address yourself)
 export CPROXY=http://username:password@192.168.20.1:7890
@@ -60,8 +60,8 @@ chmod +x activated.sh
 # 1. 普通 Normal
 curl -fsSL https://raw.githubusercontent.com/ohyeah521/Surveillance-Station/main/activated.sh | bash -s -- -r
 # 2. 使用 github 代理(可自行更换代理, 注意结尾的/) Using github proxy (Please replace the proxy address yourself)
-export GPROXY=https://gh-proxy.com/
-curl -fsSL ${GPROXY}https://raw.githubusercontent.com/ohyeah521/Surveillance-Station/main/activated.sh | bash -s -- -r
+export GPROXY=https://gh-proxy.org/
+curl -fsSL ${GPROXY:-}https://raw.githubusercontent.com/ohyeah521/Surveillance-Station/main/activated.sh | bash -s -- -r
 export GPROXY=
 # 3. 使用 http(s)/socks5 代理(请自行更换代理地址) Using http(s)/socks5 proxy (Please replace the proxy address yourself)
 export CPROXY=http://username:password@192.168.20.1:7890
